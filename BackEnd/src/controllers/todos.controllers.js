@@ -85,11 +85,43 @@ const deleteTodos = async (req , res) => {
             message: 'Internal server error'
         })
     }
-    
-    res.send ('todo deleted')
 }
-const editTodos = (req , res) => {
-    res.send ('todo edited')
+const editTodos = async (req , res) => {
+    const {id} = req.params
+    const {title , description} = req.body
+
+    if(!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({
+        message: 'Enter valid id'
+    })
+
+    if (!title || !description) return res.status(400).json({
+        messgage: 'title or description is required'
+    })
+    
+    try {
+        const todo = await Todos.findByIdAndUpdate(
+            {
+                _id: id
+            },
+            {
+                title , description
+            },
+            {new: true}
+        )
+        
+        if (!todo) return res.status(404).json({
+            message: 'no todo found'
+        })
+        
+        res.json({
+            updatedTodo: todo,
+            message: "todo updated successfully"
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'Internal server error'
+        })
+    }
 }
 
 export {addTodos , getAllTodos , getSingleTodos , editTodos , deleteTodos}
