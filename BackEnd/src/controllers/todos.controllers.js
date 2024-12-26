@@ -1,16 +1,91 @@
 import Todos from "../models/todos.models.js"
+import mongoose from "mongoose"
 
-const addTodos = (req , res) => {
-    console.log ('hellow world')
-    res.send ('<h1>todo added</h1>')
+const addTodos = async (req , res) => {
+    
+    const {title , description} = req.body
+
+    if(!title || !description) return res.status(400).json({
+        message: 'title or description is required'
+    })
+
+    try {
+        const todo = await Todos.create ({
+            title , description
+        })
+    
+        res.json({
+            message: 'todo added successfully', 
+            data: todo
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'Internal server error'
+        })
+    }
 }
-const getAllTodos = (req , res) => {
-    res.send ('all todos obtained')
+const getAllTodos = async (req , res) => {
+
+    try {
+        const todo = await Todos.find ({})
+        res.json({
+            data: todo,
+            message: 'All todos obtained'
+        })
+    } catch(error) {
+        res.status(500).json({
+            message: 'Internal server error'
+        })
+    }
 }
-const getSingleTodos = (req , res) => {
-    res.send ('Single todo obtained')
+const getSingleTodos = async (req , res) => {
+    const {id} = req.params
+    
+    if(!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({
+        message: 'Enter valid id'
+    })
+
+    try {
+        const todo = await Todos.findById({_id: id})
+
+        if (!todo) return res.status(404).json({
+            message: 'no todo found'
+        })
+
+        res.json({
+            data: todo,
+            message: "todo obtained successfully"
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'Internal server error'
+        })
+    }
 }
-const deleteTodos = (req , res) => {
+const deleteTodos = async (req , res) => {
+    const {id} = req.params
+
+    if(!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({
+        message: 'Enter valid id'
+    })
+    
+    try {
+        const todo = await Todos.findByIdAndDelete({_id: id})
+        
+        if (!todo) return res.status(404).json({
+            message: 'no todo found'
+        })
+        
+        res.json({
+            deletedTodo: todo,
+            message: "todo deleted successfully"
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'Internal server error'
+        })
+    }
+    
     res.send ('todo deleted')
 }
 const editTodos = (req , res) => {
