@@ -13,11 +13,6 @@ app.use(cors())
 app.use ('/api/v1' , todoRoutes)
 
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
-
 connectDB()
   .then(() => {
     app.listen(process.env.PORT, () => {

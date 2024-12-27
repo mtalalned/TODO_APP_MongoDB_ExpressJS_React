@@ -95,7 +95,7 @@ const editTodos = async (req , res) => {
     })
 
     if (!title || !description) return res.status(400).json({
-        messgage: 'title or description is required'
+        message: 'title or description is required'
     })
     
     try {
